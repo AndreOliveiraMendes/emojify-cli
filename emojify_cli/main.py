@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
+from emojify_cli import __version__
 import argparse
 import json
 import os
-import unicodedata
 import sys
+import unicodedata
 
 # -----------------------
 # Default mappings
@@ -59,6 +60,7 @@ def load_config(path=None):
         with open(path) as f:
             return json.load(f)
     except Exception:
+        print(f"Invalid JSON config: {e}", file=sys.stderr)
         return {}
 
 
@@ -66,7 +68,7 @@ def merge_config(base, overrides):
     """Merge mapping configs recursively."""
     result = dict(base)
     for key, value in overrides.items():
-        if isinstance(value, dict) and key in result:
+        if isinstance(value, dict) and isinstance(result.get(key), dict):
             result[key] = merge_config(result[key], value)
         else:
             result[key] = value
@@ -83,8 +85,7 @@ def normalize_ascii(s: str) -> str:
         if unicodedata.category(c) != "Mn"
     )
 
-
-def emojify(msg: str, cfg):
+def emojify(msg: str, cfg: dict) -> str:
     if cfg.get("normalize", True):
         msg = normalize_ascii(msg)
 
@@ -95,9 +96,10 @@ def emojify(msg: str, cfg):
 
     out = []
 
-    for ch in msg.lower():
-        if ch in letters:
-            out.append(letters[ch])
+    for ch in msg:
+        key = ch.lower()
+        if key in letters:
+            out.append(letters[key])
         elif ch in numbers:
             out.append(numbers[ch])
         elif ch in symbols:
@@ -117,8 +119,7 @@ def emojify(msg: str, cfg):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Convert text to Discord emoji codes.",
-        add_help=False
+        description="Convert text to Discord emoji codes."
     )
 
     parser.add_argument("text", nargs="*", help="Text to convert")
@@ -129,7 +130,12 @@ def main():
     parser.add_argument("--no-normalize", action="store_true")
     parser.add_argument("--config", help="Custom config file")
     parser.add_argument("--dump-config", action="store_true")
-    parser.add_argument("-h", "--help", action="help")
+
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {__version__}"
+    )
 
     args = parser.parse_args()
 
