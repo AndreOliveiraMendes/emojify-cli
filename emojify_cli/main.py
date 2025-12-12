@@ -115,7 +115,7 @@ def emojify(msg: str, cfg):
 # Main
 # -----------------------
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(
         description="Convert text to Discord emoji codes.",
         add_help=False
@@ -160,3 +160,5 @@ if __name__ == "__main__":
 
     print(emojify(message, cfg))
 
+if __name__ == '__main__':
+    main()
