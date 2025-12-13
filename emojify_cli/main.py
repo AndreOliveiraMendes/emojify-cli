@@ -40,7 +40,10 @@ DEFAULT_CONFIG = {
     "mappings": {
         "letters": LETTER_EMOJI,
         "numbers": NUMBER_EMOJI,
-        "symbols": SYMBOL_EMOJI
+        "symbols": SYMBOL_EMOJI,
+        "macro": {
+            "000": "#"
+        }
     }
 }
 
@@ -85,11 +88,31 @@ def normalize_ascii(s: str) -> str:
         if unicodedata.category(c) != "Mn"
     )
 
+def expand_macros(msg: str, macros: dict) -> str:
+    out = []
+    i = 0
+    n = len(msg)
+
+    while i < n:
+        if msg[i] == "#" and i + 3 < n and msg[i+1:i+4].isdigit():
+            code = msg[i+1:i+4]
+            if code in macros:
+                out.append(macros[code])
+                i += 4
+                continue
+        out.append(msg[i])
+        i += 1
+
+    return "".join(out)
+
 def emojify(msg: str, cfg: dict) -> str:
     if cfg.get("normalize", True):
         msg = normalize_ascii(msg)
 
     m = cfg.get("mappings", {})
+    macros = m.get("macro", {})
+    msg = expand_macros(msg, macros)
+
     letters = m.get("letters", {})
     numbers = m.get("numbers", {})
     symbols = m.get("symbols", {})
@@ -107,11 +130,7 @@ def emojify(msg: str, cfg: dict) -> str:
         else:
             out.append(ch)
 
-    if cfg.get("compact"):
-        return "".join(out)
-
-    return " ".join(out)
-
+    return "".join(out) if cfg.get("compact") else " ".join(out)
 
 # -----------------------
 # Main
