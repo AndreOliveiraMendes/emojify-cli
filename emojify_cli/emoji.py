@@ -1,0 +1,55 @@
+# emojify_cli/emoji.py
+
+import unicodedata
+
+def normalize_ascii(s: str) -> str:
+    return "".join(
+        c for c in unicodedata.normalize("NFD", s)
+        if unicodedata.category(c) != "Mn"
+    )
+
+
+def expand_macros(msg: str, macros: dict) -> str:
+    out = []
+    i = 0
+    n = len(msg)
+
+    while i < n:
+        if msg[i] == "#" and i + 3 < n and msg[i+1:i+4].isdigit():
+            code = msg[i+1:i+4]
+            if code in macros:
+                out.append(macros[code])
+                i += 4
+                continue
+        out.append(msg[i])
+        i += 1
+
+    return "".join(out)
+
+
+def emojify(msg: str, cfg: dict) -> str:
+    if cfg.get("normalize", True):
+        msg = normalize_ascii(msg)
+
+    m = cfg.get("mappings", {})
+    msg = expand_macros(msg, m.get("macro", {}))
+
+    letters = m.get("letters", {})
+    numbers = m.get("numbers", {})
+    symbols = m.get("symbols", {})
+
+    out = []
+
+    for ch in msg:
+        key = ch.lower()
+        if key in letters:
+            out.append(letters[key])
+        elif ch in numbers:
+            out.append(numbers[ch])
+        elif ch in symbols:
+            out.append(symbols[ch])
+        else:
+            out.append(ch)
+
+    return "".join(out) if cfg.get("compact") else " ".join(out)
+
