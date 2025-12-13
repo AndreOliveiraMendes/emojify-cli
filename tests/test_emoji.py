@@ -42,7 +42,7 @@ def test_symbols():
 
 def test_macro_expansion():
     assert emojify("hi #001", BASE_CFG) == (
-        "h i :fire:"
+        "h i   :fire:"
     )
 
 

@@ -9,7 +9,7 @@ def normalize_ascii(s: str) -> str:
     )
 
 
-def expand_macros(msg: str, macros: dict) -> str:
+def expand_macros(msg: str, macros: dict) -> list:
     out = []
     i = 0
     n = len(msg)
@@ -18,13 +18,13 @@ def expand_macros(msg: str, macros: dict) -> str:
         if msg[i] == "#" and i + 3 < n and msg[i+1:i+4].isdigit():
             code = msg[i+1:i+4]
             if code in macros:
-                out.append(macros[code])
+                out.append({"item":macros[code], "macro":True})
                 i += 4
                 continue
-        out.append(msg[i])
+        out.append({"item":msg[i], "macro":False})
         i += 1
 
-    return "".join(out)
+    return out
 
 
 def emojify(msg: str, cfg: dict) -> str:
@@ -40,7 +40,12 @@ def emojify(msg: str, cfg: dict) -> str:
 
     out = []
 
-    for ch in msg:
+    for packet in msg:
+        ch = packet['item']
+        macro = packet['macro']
+        if macro:
+            out.append(ch)
+            continue
         key = ch.lower()
         if key in letters:
             out.append(letters[key])
