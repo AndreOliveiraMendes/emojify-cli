@@ -1,4 +1,4 @@
-from emojify_cli.emoji import emojify
+from emojify_cli.emoji import emojify, expand_macros, Token
 
 BASE_CFG = {
     "compact": False,
@@ -56,4 +56,30 @@ def test_compact_mode():
     assert emojify("a1!", cfg) == (
         ":regional_indicator_a::one::exclamation:"
     )
+
+def test_expand_macros_basic():
+    macros = {"001": ":fire:"}
+    tokens = list(expand_macros("a#001b", macros))
+
+    assert tokens == [
+        Token("a", False),
+        Token(":fire:", True),
+        Token("b", False),
+    ]
+
+def test_expand_macros_failed():
+    macros = {"001": ":fire:"}
+    tokens = list(expand_macros("#001#999#abc", macros))
+
+    assert tokens == [
+        Token(":fire:", True),
+        Token("#", False),
+        Token("9", False),
+        Token("9", False),
+        Token("9", False),
+        Token("#", False),
+        Token("a", False),
+        Token("b", False),
+        Token("c", False)
+    ]
 
