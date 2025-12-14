@@ -18,5 +18,5 @@ authors = [
 ]
 
 [project.scripts]
-emojify = "emojify_cli.main:main"
+emojify = "emojify_cli.cli:main"
 

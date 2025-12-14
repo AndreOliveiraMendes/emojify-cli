@@ -1,5 +1,6 @@
 # emojify_cli/__main__.py
 from emojify_cli.cli import main
 
-main()
+if __name__ == "__main__":
+    main()
 
