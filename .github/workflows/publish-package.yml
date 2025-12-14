@@ -26,11 +26,19 @@ jobs:
       - name: Build package
         run: python -m build
 
+      - name: Validate publish mode
+        run: |
+          if [ "${{ secrets.PUBLISH_MODE }}" != "test" ] && \
+             [ "${{ secrets.PUBLISH_MODE }}" != "release" ]; then
+            echo "Invalid PUBLISH_MODE: ${{ secrets.PUBLISH_MODE }}"
+            exit 1
+          fi
+
       # --------------------
       # Publish to TestPyPI
       # --------------------
       - name: Publish to TestPyPI
-        if: contains(github.ref_name, 'a') || contains(github.ref_name, 'b') || contains(github.ref_name, 'rc')
+        if: ${{ secrets.PUBLISH_MODE == 'test' }}
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
@@ -39,5 +47,5 @@ jobs:
       # Publish to PyPI
       # --------------------
       - name: Publish to PyPI
-        if: "!contains(github.ref_name, 'a') && !contains(github.ref_name, 'b') && !contains(github.ref_name, 'rc')"
+        if: ${{ secrets.PUBLISH_MODE == 'release' }}
         uses: pypa/gh-action-pypi-publish@release/v1
