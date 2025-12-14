@@ -13,6 +13,10 @@ jobs:
       id-token: write
       contents: read
 
+    # 🔹 Environment variables do workflow
+    env:
+      PUBLISH_MODE: test   # test | release
+
     steps:
       - uses: actions/checkout@v4
 
@@ -26,19 +30,26 @@ jobs:
       - name: Build package
         run: python -m build
 
+      # --------------------
+      # Validate mode
+      # --------------------
       - name: Validate publish mode
         run: |
-          if [ "${{ secrets.PUBLISH_MODE }}" != "test" ] && \
-             [ "${{ secrets.PUBLISH_MODE }}" != "release" ]; then
-            echo "Invalid PUBLISH_MODE: ${{ secrets.PUBLISH_MODE }}"
-            exit 1
-          fi
+          case "$PUBLISH_MODE" in
+            test|release)
+              echo "Publish mode: $PUBLISH_MODE"
+              ;;
+            *)
+              echo "Invalid PUBLISH_MODE: $PUBLISH_MODE"
+              exit 1
+              ;;
+          esac
 
       # --------------------
       # Publish to TestPyPI
       # --------------------
       - name: Publish to TestPyPI
-        if: ${{ secrets.PUBLISH_MODE == 'test' }}
+        if: env.PUBLISH_MODE == 'test'
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
@@ -47,5 +58,5 @@ jobs:
       # Publish to PyPI
       # --------------------
       - name: Publish to PyPI
-        if: ${{ secrets.PUBLISH_MODE == 'release' }}
+        if: env.PUBLISH_MODE == 'release'
         uses: pypa/gh-action-pypi-publish@release/v1
