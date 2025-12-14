@@ -49,7 +49,7 @@ def emojify(msg: str, cfg: dict) -> str:
         if macro:
             out.append(ch)
             continue
-        key = ch.lower()
+        key = ch.lower() if not cfg.get("case", False) else ch
         if key in letters:
             out.append(letters[key])
         elif ch in numbers:

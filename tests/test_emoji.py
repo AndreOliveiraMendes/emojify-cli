@@ -3,10 +3,13 @@ from emojify_cli.emoji import emojify, expand_macros, Token
 BASE_CFG = {
     "compact": False,
     "normalize": True,
+    "case": False,
     "mappings": {
         "letters": {
             "a": ":regional_indicator_a:",
-            "b": ":regional_indicator_b:"
+            "b": ":regional_indicator_b:",
+            "A": ":a:",
+            "B": ":b:"
         },
         "numbers": {
             "1": ":one:"
@@ -25,6 +28,22 @@ BASE_CFG = {
 def test_letters():
     assert emojify("ab", BASE_CFG) == (
         ":regional_indicator_a: :regional_indicator_b:"
+    )
+
+
+def test_letters_case():
+    cfg = dict(BASE_CFG)
+    cfg["case"] = True
+    assert emojify("aA", cfg) == (
+        ":regional_indicator_a: :a:"
+    )
+
+
+def test_letters_icase():
+    cfg = dict(BASE_CFG)
+    cfg["case"] = False
+    assert emojify("aA", cfg) == (
+        ":regional_indicator_a: :regional_indicator_a:"
     )
 
 
@@ -57,6 +76,7 @@ def test_compact_mode():
         ":regional_indicator_a::one::exclamation:"
     )
 
+
 def test_expand_macros_basic():
     macros = {"001": ":fire:"}
     tokens = list(expand_macros("a#001b", macros))
@@ -66,6 +86,7 @@ def test_expand_macros_basic():
         Token(":fire:", True),
         Token("b", False),
     ]
+
 
 def test_expand_macros_failed():
     macros = {"001": ":fire:"}

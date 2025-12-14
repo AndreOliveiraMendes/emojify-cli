@@ -23,6 +23,8 @@ def main():
     parser.add_argument("--no-normalize", action="store_true")
     parser.add_argument("--config", help="Custom config file")
     parser.add_argument("--dump-config", action="store_true")
+    parser.add_argument("--case", action="store_true")
+    parser.add_argument("--icase", action="store_true")
 
     parser.add_argument(
         "--version",
@@ -44,6 +46,11 @@ def main():
         cfg["normalize"] = True
     if args.no_normalize:
         cfg["normalize"] = False
+
+    if args.case:
+        cfg["case"] = True
+    if args.icase:
+        cfg["case"] = False
 
     if args.dump_config:
         print(json.dumps(cfg, indent=4))
