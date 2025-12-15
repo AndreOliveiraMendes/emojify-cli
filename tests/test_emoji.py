@@ -3,13 +3,15 @@ from emojify_cli.emoji import emojify, expand_macros, Token
 BASE_CFG = {
     "compact": False,
     "normalize": True,
-    "case": False,
+    "case": 'off',
     "mappings": {
         "letters": {
             "a": ":regional_indicator_a:",
             "b": ":regional_indicator_b:",
+            "c": ":regional_indicator_c:",
             "A": ":a:",
-            "B": ":b:"
+            "B": ":b:",
+            "D": ":d:"
         },
         "numbers": {
             "1": ":one:"
@@ -19,7 +21,8 @@ BASE_CFG = {
         },
         "macro": {
             "000": "#",
-            "001": ":fire:"
+            "001": ":fire:",
+            "002": ":X:"
         }
     }
 }
@@ -33,18 +36,33 @@ def test_letters():
 
 def test_letters_case():
     cfg = dict(BASE_CFG)
-    cfg["case"] = True
-    assert emojify("aA", cfg) == (
-        ":regional_indicator_a: :a:"
+    cfg["case"] = "on"
+    assert emojify("aAbBcCdD", cfg) == (
+            ":regional_indicator_a: :a: :regional_indicator_b: :b: :regional_indicator_c: C d :d:"
     )
 
 
 def test_letters_icase():
     cfg = dict(BASE_CFG)
-    cfg["case"] = False
-    assert emojify("aA", cfg) == (
-        ":regional_indicator_a: :regional_indicator_a:"
+    cfg["case"] = "off"
+    assert emojify("aAbBcCdD", cfg) == (
+            ":regional_indicator_a: :regional_indicator_a: :regional_indicator_b: :regional_indicator_b: :regional_indicator_c: :regional_indicator_c: d d"
     )
+
+
+def test_letters_acase():
+    cfg = dict(BASE_CFG)
+    cfg["case"] = "auto"
+    assert emojify("aAbBcCdD", cfg) == (
+            ":regional_indicator_a: :a: :regional_indicator_b: :b: :regional_indicator_c: :regional_indicator_c: d :d:"
+    )
+
+
+def test_macro_ignores_case():
+    cfg = dict(BASE_CFG)
+    cfg["case"] = "auto"
+
+    assert emojify("#002A", cfg) == ":X: :a:"
 
 
 def test_numbers():

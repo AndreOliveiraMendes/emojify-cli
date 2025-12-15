@@ -27,7 +27,7 @@ SYMBOL_EMOJI = {
 DEFAULT_CONFIG = {
     "compact": False,
     "normalize": True,
-    "case": False,
+    "case": 'off',
     "mappings": {
         "letters": LETTER_EMOJI,
         "numbers": NUMBER_EMOJI,

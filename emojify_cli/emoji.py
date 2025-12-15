@@ -36,6 +36,7 @@ def emojify(msg: str, cfg: dict) -> str:
         msg = normalize_ascii(msg)
 
     m = cfg.get("mappings", {})
+    case_mode = cfg.get("case", "off")
 
     letters = m.get("letters", {})
     numbers = m.get("numbers", {})
@@ -49,9 +50,22 @@ def emojify(msg: str, cfg: dict) -> str:
         if macro:
             out.append(ch)
             continue
-        key = ch.lower() if not cfg.get("case", False) else ch
-        if key in letters:
-            out.append(letters[key])
+        if ch.isalpha():
+            key = ch
+
+            if case_mode == "off":
+                key = ch.lower()
+                out.append(letters.get(key, key))
+
+            elif case_mode == "on":
+                out.append(letters.get(ch, ch))
+
+            elif case_mode == "auto":
+                if ch in letters:
+                    out.append(letters[ch])
+                else:
+                    out.append(letters.get(ch.lower(), ch))
+
         elif ch in numbers:
             out.append(numbers[ch])
         elif ch in symbols:

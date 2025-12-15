@@ -37,6 +37,14 @@ For a full list of options and a brief explanation, use the command below:
 emojify --help
 ```
 
+### Case modes
+
+```bash
+--case off   # force lowercase (default)
+--case on    # case-sensitive
+--case auto  # fallback to lowercase if missing
+```
+
 ### Note for Termux users
 
 On Termux, prefer using `virtualenv` instead of `python -m venv`

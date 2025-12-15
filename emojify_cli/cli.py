@@ -8,7 +8,12 @@ from emojify_cli import __version__
 from emojify_cli.config import load_config, merge_config
 from emojify_cli.defaults import DEFAULT_CONFIG
 from emojify_cli.emoji import emojify
+from enum import Enum
 
+class CaseMode(str, Enum):
+    off = "off"
+    on = "on"
+    auto = "auto"
 
 def main():
     parser = argparse.ArgumentParser(
@@ -23,8 +28,11 @@ def main():
     parser.add_argument("--no-normalize", action="store_true")
     parser.add_argument("--config", help="Custom config file")
     parser.add_argument("--dump-config", action="store_true")
-    parser.add_argument("--case", action="store_true")
-    parser.add_argument("--icase", action="store_true")
+    parser.add_argument(
+        "--case",
+        choices=CaseMode,
+        default=CaseMode.off,
+    )
 
     parser.add_argument(
         "--version",
@@ -48,9 +56,7 @@ def main():
         cfg["normalize"] = False
 
     if args.case:
-        cfg["case"] = True
-    if args.icase:
-        cfg["case"] = False
+        cfg["case"] = args.case
 
     if args.dump_config:
         print(json.dumps(cfg, indent=4))
