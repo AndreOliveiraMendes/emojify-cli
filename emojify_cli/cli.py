@@ -39,9 +39,10 @@ def main():
     run.add_argument("--no-normalize", action="store_true")
     run.add_argument(
         "--case",
-        choices=CaseMode,
-        default=CaseMode.off,
+        choices=[c.value for c in CaseMode],
+        default=CaseMode.off.value,
     )
+    run.add_argument("--config", help="Custom config file (temporary)")
 
     # sub comand config
     config = sub.add_parser("config", help="Manage configuration")
@@ -55,9 +56,12 @@ def main():
     if args.command is None:
         args.command = "run"
 
+    cfg = merge_config(
+        DEFAULT_CONFIG,
+        load_config(args.config),
+    )
+
     if args.command == "run":
-        user_cfg = load_config(None)
-        cfg = merge_config(DEFAULT_CONFIG, user_cfg)
 
         if args.compact:
             cfg["compact"] = True
@@ -75,10 +79,9 @@ def main():
         print(emojify(message, cfg))
 
     elif args.command == "config":
-        cfg = load_config(args.config)
-        cfg = merge_config(DEFAULT_CONFIG, cfg)
-
         if args.dump:
             print(json.dumps(cfg, indent=4))
             sys.exit(0)
+        else:
+            print("nothing else yet, try --dump for now")
 
