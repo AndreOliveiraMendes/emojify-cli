@@ -33,22 +33,29 @@ def main():
 
     run.add_argument("text", nargs="*", help="Text to convert")
 
-    run.add_argument("-c", "--compact", action="store_true")
-    run.add_argument("--no-compact", action="store_true")
-    run.add_argument("--normalize", action="store_true")
-    run.add_argument("--no-normalize", action="store_true")
     run.add_argument(
         "--case",
         choices=[c.value for c in CaseMode],
         default=CaseMode.off.value,
+        help="control case conversion"
     )
     run.add_argument("--config", help="Custom config file (temporary)")
+
+    # compact group
+    compact_group = run.add_mutually_exclusive_group()
+    compact_group.add_argument("-c", "--compact", action="store_true", help="output emojis without spaces")
+    compact_group.add_argument("--no-compact", action="store_true", help="output emojis with spaces")
+
+    # normal group
+    normal_group = run.add_mutually_exclusive_group()
+    normal_group.add_argument("--normalize", action="store_true", help="normalize accented characters (e.g. á → a, ç → c)")
+    normal_group.add_argument("--no-normalize", action="store_true", help="disable character normalization")
 
     # sub comand config
     config = sub.add_parser("config", help="Manage configuration")
 
     config.add_argument("--config", help="Custom config file")
-    config.add_argument("--dump", action="store_true")
+    config.add_argument("--dump", action="store_true", help="show current config being used")
 
     args = parser.parse_args()
 
