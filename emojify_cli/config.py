@@ -28,3 +28,16 @@ def merge_config(base, overrides):
             result[key] = value
     return result
 
+def init_config(base):
+    path = os.path.expanduser("~/.emojify.json")
+
+    if os.path.exists(path):
+        return 1, "config file already exists"
+
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(base, f, indent=4)
+        return 0, "config file created successfully"
+    except Exception as e:
+        return 2, f"unable to create config file: {e}"
+
