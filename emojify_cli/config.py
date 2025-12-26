@@ -3,6 +3,7 @@
 import json
 import os
 import sys
+from emojify_cli.util import open_editor
 
 def load_config(path=None):
     if not path:
@@ -41,3 +42,7 @@ def init_config(base):
     except Exception as e:
         return 2, f"unable to create config file: {e}"
 
+def edit_config():
+    path = os.path.expanduser("~/.emojify.json")
+
+    open_editor(path)

@@ -4,7 +4,7 @@ import json
 import sys
 
 from emojify_cli import __version__
-from emojify_cli.config import load_config, merge_config, init_config
+from emojify_cli.config import load_config, merge_config, init_config, edit_config
 from emojify_cli.defaults import DEFAULT_CONFIG
 from emojify_cli.emoji import emojify
 from enum import Enum
@@ -55,8 +55,12 @@ def main():
     config = sub.add_parser("config", help="Manage configuration")
 
     config.add_argument("--config", help="Custom config file")
-    config.add_argument("--dump", action="store_true", help="print the effective configuration")
-    config.add_argument("--init", action="store_true", help="create a default config file in the user home (no overwrite)")
+
+    # configuration group
+    config_group = config.add_mutually_exclusive_group()
+    config_group.add_argument("--dump", action="store_true", help="print the effective configuration")
+    config_group.add_argument("--init", action="store_true", help="create a default config file in the user home (no overwrite)")
+    config_group.add_argument("--edit", action="store_true", help="edit the user config file (auto-create if missing)")
 
     args = parser.parse_args()
 
@@ -97,6 +101,8 @@ def main():
             else:
                 print(msg, file=sys.stderr)
             sys.exit(rc)
+        elif args.edit:
+            edit_config()
         else:
             print("no matching argument found, try emojify config --help")
             sys.exit(1)
